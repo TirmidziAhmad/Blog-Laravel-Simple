@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PostsController extends Controller
 {
@@ -11,9 +12,8 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $postsTxt = Storage::get("public\posts.txt");
-        $postsTxtIntoArr = explode ("\n", $postsTxt);
-        return view('posts.index', compact('postsTxtIntoArr'));
+        $posts= DB::table('posts')->get();
+        return view('posts.index', ['posts' => $posts]);
     }
     /**
      * Show the form for creating a new resource.
@@ -30,21 +30,13 @@ class PostsController extends Controller
     {
         $title = $request->input('title');
         $content = $request->input('content');
-
-        $view_data = Storage::get("public\posts.txt");
-        $view_data_into_arr = explode ("\n", $view_data);
-
-        $new_post = [
-            $id = count($view_data_into_arr) + 1,
-            $title ,
-            $content,
-            date('Y-m-d H:i:s')
-        ];
-
-        $new_post = implode(",", $new_post);
-        array_push($view_data_into_arr, $new_post);
-        $posts = implode("\n", $view_data_into_arr);
-        Storage::put('public/posts.txt', $posts);
+        
+        DB::table('posts')->insert([
+            'title'=> $title,
+            'content'=> $content,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
         return redirect('/posts');
     }
 
@@ -53,13 +45,8 @@ class PostsController extends Controller
      */
     public function show(string $id)
     {
-        $postsTxt = storage::get('public/posts.txt');
-
-        $postsTxtIntoArr = explode ("\n", $postsTxt);
-
-        $view_data = explode(",", $postsTxtIntoArr[$id]);
-
-        return view('posts.show', compact('view_data'));
+        $posts = DB::table('posts')->where('id', $id)->get();
+        return view('posts.show', ['posts' => $posts]);
     }
 
     /**
@@ -67,7 +54,8 @@ class PostsController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $posts = DB::table('posts')->where('id', $id)->get();
+        return view('posts.edit', ['posts' => $posts]);
     }
 
     /**
@@ -75,7 +63,15 @@ class PostsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $title = $request->input('title');
+        $content = $request->input('content');
+        
+        DB::table('posts')->where('id', $id)->update([
+            'title'=> $title,
+            'content'=> $content,
+            'updated_at' => now()
+        ]);
+        return redirect('/posts');
     }
 
     /**
@@ -83,6 +79,7 @@ class PostsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        DB::table('posts')->where('id', $id)->delete();
+        return redirect('/posts');
     }
 }
