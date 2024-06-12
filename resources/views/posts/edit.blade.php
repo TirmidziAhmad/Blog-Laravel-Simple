@@ -17,7 +17,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="content" class="form-label" id="content" >Konten</label>
-                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="content" >{{ $post->content }}"</textarea>
+                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="content" >{{ $post->content }}</textarea>
                 </div>
                 <button type="submit" class="btn btn-success">Simpan</button>
                 <a href="{{ url("posts") }}" class="btn btn-primary">Kembali</a>

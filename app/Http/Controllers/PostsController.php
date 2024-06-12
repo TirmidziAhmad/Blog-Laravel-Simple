@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB; 
+use app\Models\Post;
 
 class PostsController extends Controller
 {
@@ -12,7 +13,7 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts= DB::table('posts')->get();
+        $posts= Post::active()->get();
         return view('posts.index', ['posts' => $posts]);
     }
     /**
