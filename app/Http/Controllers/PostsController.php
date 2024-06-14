@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; 
-use app\Models\Post;
+use Illuminate\Http\Request; 
+use App\Models\Post;
 
 class PostsController extends Controller
 {
@@ -32,13 +31,11 @@ class PostsController extends Controller
         $title = $request->input('title');
         $content = $request->input('content');
         
-        DB::table('posts')->insert([
+        Post::create([
             'title'=> $title,
-            'content'=> $content,
-            'created_at' => now(),
-            'updated_at' => now()
+            'content'=> $content
         ]);
-        return redirect('/posts');
+        return redirect('posts');
     }
 
     /**
@@ -46,8 +43,14 @@ class PostsController extends Controller
      */
     public function show(string $id)
     {
-        $posts = DB::table('posts')->where('id', $id)->get();
-        return view('posts.show', ['posts' => $posts]);
+        // Retrieve all posts with their comments
+        $insPosts = Post::first();
+        $posts = $insPosts->where('id', $id)->get();
+        $comments = $insPosts->comments()->get();
+        // Pass the posts to the view
+        return view('posts.show', ['posts' => $posts,'comments'=> $comments ]);
+
+        
     }
 
     /**
@@ -55,7 +58,7 @@ class PostsController extends Controller
      */
     public function edit(string $id)
     {
-        $posts = DB::table('posts')->where('id', $id)->get();
+        $posts = Post::where('id', $id)->get();
         return view('posts.edit', ['posts' => $posts]);
     }
 
@@ -67,7 +70,7 @@ class PostsController extends Controller
         $title = $request->input('title');
         $content = $request->input('content');
         
-        DB::table('posts')->where('id', $id)->update([
+        Post::where('id', $id)->update([
             'title'=> $title,
             'content'=> $content,
             'updated_at' => now()
@@ -80,7 +83,7 @@ class PostsController extends Controller
      */
     public function destroy(string $id)
     {
-        DB::table('posts')->where('id', $id)->delete();
+        Post::where('id', $id)->delete();
         return redirect('/posts');
     }
 }
